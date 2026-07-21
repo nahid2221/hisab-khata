@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>হিসাব খাতা</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Da+2:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --spine:#7E1D34;
+    --spine-dark:#5E1526;
+    --rule:#D9A6AC;
+    --rule-soft:#EAD3D6;
+    --ink:#241E1C;
+    --ink-soft:#6B615C;
+    --brass:#A9762F;
+    --ok:#2F6B4F;
+    --danger:#B23B3B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Hind Siliguri',sans-serif;
+    background:var(--spine-dark);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  .book{
+    width:100%;
+    max-width:520px;
+    background:var(--spine);
+    min-height:100vh;
+    position:relative;
+    box-shadow:0 0 40px rgba(0,0,0,0.4);
+    overflow:hidden;
+  }
+
+  /* ---------- HOME (cover) ---------- */
+  .cover{
+    padding:40px 20px 20px 24px;
+    color:var(--paper);
+    position:relative;
+    min-height:100vh;
+  }
+  .cover .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    opacity:0.65;
+    text-transform:uppercase;
+  }
+  .cover h1{
+    font-family:'Baloo Da 2',sans-serif;
+    font-size:36px;
+    margin:4px 0 4px;
+  }
+  .cover p{
+    margin:0 0 26px;
+    font-size:13.5px;
+    opacity:0.75;
+  }
+  .gear{
+    position:absolute;
+    top:34px;
+    right:22px;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.08);
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    cursor:pointer;
+  }
+  .gear:active{transform:scale(0.94);}
+
+  .settings{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:22px;
+    display:none;
+    color:var(--paper);
+  }
+  .settings.open{display:block;}
+  .settings label{
+    display:block;
+    font-size:12px;
+    opacity:0.7;
+    margin-bottom:6px;
+  }
+  .settings input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.25);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    background:rgba(0,0,0,0.15);
+    color:var(--paper);
+  }
+  .settings .hint{
+    font-size:11.5px;
+    opacity:0.65;
+    margin-top:8px;
+    line-height:1.5;
+  }
+  .settings .status{
+    margin-top:10px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .status.ok{color:#8FD9AE;}
+  .status.off{color:rgba(255,255,255,0.6);}
+
+  .tabs{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .tab{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--paper);
+    border-radius:10px 4px 4px 10px;
+    padding:16px 16px 16px 18px;
+    cursor:pointer;
+    position:relative;
+    box-shadow:2px 3px 0 rgba(0,0,0,0.15);
+    border:none;
+    width:100%;
+    text-align:right;
+  }
+  .tab:active{transform:translateX(2px);}
+  .tab .swatch{
+    width:8px;
+    align-self:stretch;
+    border-radius:4px;
+    flex-shrink:0;
+  }
+  .tab .info{
+    flex:1;
+    text-align:right;
+  }
+  .tab .name{
+    font-weight:700;
+    font-size:16px;
+    color:var(--ink);
+    display:block;
+  }
+  .tab .desc{
+    font-size:12px;
+    color:var(--ink-soft);
+    display:block;
+    margin-top:2px;
+  }
+  .tab .sum{
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    font-weight:700;
+    min-width:70px;
+    text-align:left;
+  }
+
+  /* ---------- CATEGORY PAGE ---------- */
+  .catpage{
+    display:none;
+    min-height:100vh;
+  }
+  .catpage.open{display:block;}
+  .cathead{
+    padding:22px 20px 16px;
+    color:var(--paper);
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .backBtn{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.08);
+    color:var(--paper);
+    font-size:18px;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .cathead .titles{flex:1;}
+  .cathead h2{
+    font-family:'Baloo Da 2',sans-serif;
+    font-size:22px;
+    margin:0;
+  }
+  .cathead .sub{
+    font-size:12px;
+    opacity:0.7;
+  }
+
+  .page{
+    background:var(--paper);
+    border-radius:18px 18px 0 0;
+    min-height:calc(100vh - 90px);
+    position:relative;
+    padding:22px 20px 100px 34px;
+    background-image: repeating-linear-gradient(
+        to bottom, transparent 0, transparent 43px,
+        var(--rule-soft) 43px, var(--rule-soft) 44px);
+    background-position: 0 96px;
+  }
+  .page::before{
+    content:"";
+    position:absolute;
+    left:22px; top:0; bottom:0; width:2px;
+    background:var(--rule); opacity:0.7;
+  }
+  .page::after{
+    content:"";
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background-image: radial-gradient(circle, var(--spine-dark) 3px, transparent 3.2px);
+    background-size: 14px 44px;
+    background-position: 3px 22px;
+    opacity:0.55;
+  }
+
+  form{display:grid; gap:12px; margin-bottom:22px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .field label{display:block; font-size:12px; color:var(--ink-soft); margin-bottom:5px;}
+  .field input{
+    width:100%; padding:11px 12px; border:none;
+    border-bottom:2px solid var(--rule); background:transparent;
+    font-family:'Hind Siliguri',sans-serif; font-size:16px; color:var(--ink); outline:none;
+  }
+  .field input:focus{border-bottom-color:var(--spine);}
+
+  button.add{
+    background:var(--spine); color:var(--paper); border:none;
+    padding:13px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;
+    font-family:'Hind Siliguri',sans-serif;
+  }
+  button.add:active{transform:scale(0.98);}
+
+  .entries{display:flex; flex-direction:column;}
+  .entry{
+    display:grid; grid-template-columns:1fr auto; align-items:baseline;
+    gap:10px; padding:13px 0; border-bottom:1px dashed var(--rule);
+    animation:write 0.35s ease-out;
+  }
+  @keyframes write{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .entry .name{font-weight:600; font-size:15px;}
+  .entry .qty{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft); display:block; margin-top:2px;}
+  .entry .amt{font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:var(--ink);}
+  .entry .sync-mark{grid-column:1/-1; font-size:10.5px; font-family:'JetBrains Mono',monospace;}
+  .sync-mark.ok{color:var(--ok);} .sync-mark.pending{color:var(--ink-soft);} .sync-mark.fail{color:var(--danger);}
+
+  .empty{text-align:center; padding:40px 10px; color:var(--ink-soft); font-size:13.5px;}
+
+  .grand-total{
+    position:sticky; bottom:0; background:var(--paper);
+    border-top:2px solid var(--spine); margin:0 -20px 0 -34px;
+    padding:16px 20px 20px 34px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .grand-total .label{font-size:13px; color:var(--ink-soft);}
+  .grand-total .value{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; color:var(--spine);}
+</style>
+</head>
+<body>
+<div class="book">
+
+  <!-- HOME -->
+  <div class="cover" id="homeView">
+    <button class="gear" id="gearBtn" aria-label="সেটিংস">⚙</button>
+    <div class="eyebrow">আপনার</div>
+    <h1>হিসাব খাতা</h1>
+    <p>খাতা বেছে নিয়ে খরচ লিখুন</p>
+
+    <div class="settings" id="settingsPanel">
+      <label for="scriptUrl">Google Apps Script Web App URL</label>
+      <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+      <div class="hint">সব ক্যাটাগরির ডাটা একই শিটে যাবে, একটা কলামে ক্যাটাগরির নাম লেখা থাকবে।</div>
+      <div class="status off" id="syncStatus">● সিঙ্ক বন্ধ আছে (URL দেওয়া হয়নি)</div>
+    </div>
+
+    <div class="tabs" id="tabsList"></div>
+  </div>
+
+  <!-- CATEGORY PAGE (template rendered dynamically) -->
+  <div class="catpage" id="catView">
+    <div class="cathead">
+      <button class="backBtn" id="backBtn">←</button>
+      <div class="titles">
+        <h2 id="catTitle"></h2>
+        <div class="sub" id="catSub"></div>
+      </div>
+    </div>
+    <div class="page">
+      <form id="entryForm">
+        <div class="field">
+          <label for="itemName">আইটেমের নাম</label>
+          <input type="text" id="itemName" placeholder="যেমন: চাল" required>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="qtyText">পরিমাণ (ইচ্ছামতো লিখুন)</label>
+            <input type="text" id="qtyText" placeholder="যেমন: ১ কেজি, ১/২ হালি">
+          </div>
+          <div class="field">
+            <label for="amount">টাকা</label>
+            <input type="number" id="amount" step="any" min="0" placeholder="০" required>
+          </div>
+        </div>
+        <button type="submit" class="add">খাতায় যোগ করুন</button>
+      </form>
+
+      <div class="entries" id="entries"></div>
+      <div class="empty" id="emptyMsg">এখনও কোনো এন্ট্রি নেই — প্রথমটা যোগ করুন</div>
+    </div>
+    <div class="grand-total">
+      <span class="label">এই খাতার মোট</span>
+      <span class="value" id="grandTotal">৳ ০.০০</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const CATEGORIES = [
+    {id:'shongshar', name:'সংসারের দৈনন্দিন খরচ', desc:'বাজার, কাপড়, বিবিধ', color:'#A9762F'},
+    {id:'basha', name:'বাসা ভাড়া ও বিল', desc:'ভাড়া, গ্যাস, বিদ্যুৎ, ইন্টারনেট', color:'#2B5D63'},
+    {id:'transport', name:'যাতায়াত খরচ', desc:'অটো, রিকশা, বাস', color:'#35507A'},
+    {id:'dokan', name:'দোকান / ব্যবসার হিসাব', desc:'কেনা-বেচার হিসাব', color:'#2F6B4F'},
+    {id:'dhar', name:'ধার-দেনা', desc:'দিলাম বা পাওনা আছে', color:'#B23B3B'},
+    {id:'bibidh', name:'বিবিধ', desc:'অন্য যেকোনো খরচ', color:'#6B4C6B'}
+  ];
+
+  let scriptUrl = '';
+  let currentCat = null;
+  const dataByCat = {}; // {catId: [entries]}
+  CATEGORIES.forEach(c => dataByCat[c.id] = []);
+
+  const homeView = document.getElementById('homeView');
+  const catView = document.getElementById('catView');
+  const tabsList = document.getElementById('tabsList');
+  const gearBtn = document.getElementById('gearBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const scriptUrlInput = document.getElementById('scriptUrl');
+  const syncStatus = document.getElementById('syncStatus');
+  const backBtn = document.getElementById('backBtn');
+  const catTitle = document.getElementById('catTitle');
+  const catSub = document.getElementById('catSub');
+  const form = document.getElementById('entryForm');
+  const itemName = document.getElementById('itemName');
+  const qtyText = document.getElementById('qtyText');
+  const amount = document.getElementById('amount');
+  const entriesEl = document.getElementById('entries');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const grandTotalEl = document.getElementById('grandTotal');
+
+  function fmt(n){
+    return '৳ ' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function todayISO(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function renderTabs(){
+    tabsList.innerHTML = '';
+    CATEGORIES.forEach(c => {
+      const total = dataByCat[c.id].reduce((s,e)=>s+e.amount,0);
+      const btn = document.createElement('button');
+      btn.className = 'tab';
+      btn.innerHTML = `
+        <span class="sum">${total ? fmt(total) : ''}</span>
+        <span class="info">
+          <span class="name">${c.name}</span>
+          <span class="desc">${c.desc}</span>
+        </span>
+        <span class="swatch" style="background:${c.color}"></span>
+      `;
+      btn.addEventListener('click', () => openCategory(c.id));
+      tabsList.appendChild(btn);
+    });
+  }
+
+  gearBtn.addEventListener('click', () => settingsPanel.classList.toggle('open'));
+  scriptUrlInput.addEventListener('input', () => {
+    scriptUrl = scriptUrlInput.value.trim();
+    if(scriptUrl){
+      syncStatus.textContent = '● সিঙ্ক চালু আছে';
+      syncStatus.className = 'status ok';
+    } else {
+      syncStatus.textContent = '● সিঙ্ক বন্ধ আছে (URL দেওয়া হয়নি)';
+      syncStatus.className = 'status off';
+    }
+  });
+
+  function openCategory(id){
+    currentCat = CATEGORIES.find(c => c.id === id);
+    catTitle.textContent = currentCat.name;
+    catSub.textContent = currentCat.desc;
+    homeView.style.display = 'none';
+    catView.classList.add('open');
+    renderEntries();
+    form.reset();
+    itemName.focus();
+  }
+  backBtn.addEventListener('click', () => {
+    catView.classList.remove('open');
+    homeView.style.display = 'block';
+    renderTabs();
+  });
+
+  function renderEntries(){
+    entriesEl.innerHTML = '';
+    const list = dataByCat[currentCat.id];
+    emptyMsg.style.display = list.length ? 'none' : 'block';
+    list.slice().reverse().forEach(e => entriesEl.appendChild(entryRow(e)));
+    grandTotalEl.textContent = fmt(list.reduce((s,e)=>s+e.amount,0));
+  }
+
+  function entryRow(e){
+    const row = document.createElement('div');
+    row.className = 'entry';
+    row.innerHTML = `
+      <div class="name">${e.item}${e.qty ? `<span class="qty">${e.qty}</span>` : ''}</div>
+      <div class="amt">${fmt(e.amount)}</div>
+      <div class="sync-mark ${e.synced === null ? 'pending' : (e.synced ? 'ok' : 'fail')}" id="mark-${e.id}">
+        ${e.synced === null ? (scriptUrl ? '○ পাঠানো হচ্ছে...' : '○ শুধু এই খাতায় (সিঙ্ক বন্ধ)') : (e.synced ? '✓ শিটে পাঠানো হয়েছে' : '✕ পাঠানো যায়নি, খাতায় আছে')}
+      </div>
+    `;
+    return row;
+  }
+
+  function markSync(id, ok){
+    const list = dataByCat[currentCat.id];
+    const e = list.find(x => x.id === id);
+    if(e) e.synced = ok;
+    const el = document.getElementById('mark-' + id);
+    if(!el) return;
+    if(ok){ el.textContent = '✓ শিটে পাঠানো হয়েছে'; el.className = 'sync-mark ok'; }
+    else { el.textContent = '✕ পাঠানো যায়নি, খাতায় আছে'; el.className = 'sync-mark fail'; }
+  }
+
+  async function sendToSheet(e){
+    if(!scriptUrl) return;
+    try{
+      await fetch(scriptUrl, {
+        method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({
+          date: e.date, category: currentCat.name,
+          item: e.item, quantity: e.qty, amount: e.amount
+        })
+      });
+      markSync(e.id, true);
+    } catch(err){ markSync(e.id, false); }
+  }
+
+  form.addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const name = itemName.value.trim();
+    const amt = parseFloat(amount.value);
+    if(!name || isNaN(amt)) return;
+
+    const entry = { id: Date.now(), date: todayISO(), item: name, qty: qtyText.value.trim(), amount: amt, synced: null };
+    dataByCat[currentCat.id].push(entry);
+    renderEntries();
+    sendToSheet(entry);
+
+    form.reset();
+    itemName.focus();
+  });
+
+  renderTabs();
+</script>
+</body>
+</html>
